@@ -1,0 +1,36 @@
+spring:
+  kafka:
+    jaas:
+      enabled: false
+    properties:
+      sasl:
+        mechanism: PLAIN
+      security:
+        protocol: SASL_PLAINTEXT
+      linger:
+        ms: 100
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: subscriptions_internal
+      auto-offset-reset: earliest
+    producer:
+      bootstrap-servers: localhost:9092
+
+# Adidas Kafka Configuration
+adidas:
+  kafka:
+    securityManager:
+      url: http://localhost
+    error:
+      retry:
+        interval: 100 # Default value in ms
+        attempts: 2
+    topics:
+      - name: create_subscription
+        num-partitions: 1
+        replication-factor: 1
+      - name: create_subscription_response
+        num-partitions: 1
+        replication-factor: 1
+
+legalAge: 18

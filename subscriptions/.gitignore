@@ -1,0 +1,17 @@
+# OpenBankingPlatform
+
+#do not include your maven settings
+/settings.xml
+
+#do not include IDE settings
+.classpath
+.project
+.settings
+/.settings
+.iml
+
+/target
+/spring.log
+
+.idea/
+.idea_modules/
