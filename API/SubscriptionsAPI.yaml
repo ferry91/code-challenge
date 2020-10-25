@@ -1,0 +1,145 @@
+openapi: 3.0.3
+servers:
+  - url: 'http://localhost:8080'
+    description: Local Server
+info:
+  description: >
+
+    # Introduction
+
+    This API contains contains a subscriptions service for customers to access our newsletters
+
+
+    # Authentication
+
+
+    We offer 1 form of authentication:
+      - OAuth2 an open protocol to allow secure authorization in a simple
+        and standard method from web, mobile and desktop applications.
+
+    <SecurityDefinitions />
+  version: 1.0.0
+  title: Adidas subscriptions service
+
+tags:
+  - name: Subscriptions
+    description: API description for subscriptions
+
+paths:
+#Biometrics
+  '/subscriptions':
+    post:
+      tags:
+        - Subscriptions
+      summary: >-
+        Receive the document and customer biometrics data captured on the front
+        end
+      operationId: createSubscription
+      requestBody:
+        description: Request body to create a subscription
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubscription'
+        required: true
+      responses:
+        '201':
+          description: 'Subscription successfully created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionId'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - auth:
+            - 'endCustomer'
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Date of the error
+          example: '2019-12-15T18:52:53.520Z'
+        errorCode:
+          type: string
+          description: Short error description
+          example: Invalid request error
+        message:
+          type: string
+          description: Long error description
+          example: Invalid input used
+        errors:
+          type: array
+          items:
+            type: string
+          description: Group of errors
+    CreateSubscription:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email address to receive the communications
+          pattern: "^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
+          example: john@adidas.com
+        firstName:
+          type: string
+          description: Name of the subscriber
+          example: John
+        gender:
+          type: string
+          description: Gender of the subscriber
+          enum: ["MALE", "FEMALE", "OTHER"]
+        dateOfBirth:
+          type: string
+          format: date
+          description: Date of birth of the subscriber
+        consentAccepted:
+          type: boolean
+          description: Flag to inform if the user has given consent
+        newsletterId:
+          type: string
+          format: uuid
+          description: Id of the newsletter to subscribe
+      required: 
+        - email
+        - dateOfBirth
+        - consentAccepted
+        - newsletterId
+    SubscriptionId:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Id of the subscription created"
+  securitySchemes:
+    auth:
+      description: >
+        Generate a JWT token to access the APIs, send the token on the
+        Authorization header
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: >-
+            /auth/realms/master/protocol/openid-connect/auth
+          tokenUrl: >-
+            /auth/realms/master/protocol/openid-connect/token
+          scopes:
+            endCustomer: End customer to access the public API
+  links: {}
+  callbacks: {}
+security: []
