@@ -1,49 +1,55 @@
-version: '3.1'
-services:
-  zookeeper-server:
-    image: 'bitnami/zookeeper:latest'
-    ports:
-      - '2181:2181'
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-  kafka-server:
-    image: 'bitnami/kafka:latest'
-    ports:
-      - '9092:9092'
-      - '9093:9093'
-    environment:
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-server:9092,EXTERNAL://localhost:9093
-      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
-    depends_on:
-      - zookeeper-server
-  db:
-    image: postgres
-    ports:
-      - '5432:5432'
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: root
-      POSTGRES_USER: root
-      POSTGRES_DB: subscriptions
-  subscriptions-service:
-    image: 'fernandogrgo/code_challenge:subscriptions'
-    ports:
-      - '8080:8080'
-    environment:
-      - JAVA_OPTIONS=-Dspring.profiles.active=docker -DKAFKA_HOSTNAME=kafka-server
-    depends_on:
-      - kafka-server
-      - db
-  subscriptions-internal-service:
-    image: 'fernandogrgo/code_challenge:subscriptions-internal'
-    ports:
-      - '8081:8080'
-    environment:
-      - JAVA_OPTIONS=-Dspring.profiles.active=docker -DKAFKA_HOSTNAME=kafka-server -DDB_HOSTNAME=db
-    depends_on:
-      - kafka-server
-      - db
+server.port: 8081
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/subscriptions
+    username: root
+    password: root
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non-contextual-creation: true
+  kafka:
+    jaas:
+      enabled: false
+    properties:
+      sasl:
+        mechanism: PLAIN
+      security:
+        protocol: SASL_PLAINTEXT
+      linger:
+        ms: 100
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: subscriptions_internal
+      auto-offset-reset: earliest
+    producer:
+      bootstrap-servers: localhost:9092
+
+# Adidas Kafka Configuration
+adidas:
+  kafka:
+    securityManager:
+      url: http://localhost
+    error:
+      retry:
+        interval: 100 # Default value in ms
+        attempts: 2
+    topics:
+      - name: create_subscription
+        num-partitions: 1
+        replication-factor: 1
+      - name: create_subscription_response
+        num-partitions: 1
+        replication-factor: 1
+      - name: welcome_email
+        num-partitions: 1
+        replication-factor: 1
