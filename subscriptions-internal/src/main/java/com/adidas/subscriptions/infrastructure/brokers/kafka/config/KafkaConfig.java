@@ -146,7 +146,6 @@ public class KafkaConfig implements WebMvcConfigurer {
 		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, springKafkaProperties.getConsumer().getAutoOffsetReset());
 		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-		ConsumerConfig.
 
 		return setJaasProperties(props);
 	}
