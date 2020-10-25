@@ -9,13 +9,13 @@ This repository aims to solve a Code challenge, the instructions of the challeng
       * [Build](#build)
       * [Run](#run)
       * [Run in docker](#run-in-docker)
+      * [API definition](#api-definition)
+      * [Test the service](#test-the-service)
+  * [Frameworks Used](#frameworks-used)
 
-
-https://petstore.swagger.io/?url=https://raw.githubusercontent.com/ferry91/code-challenge/main/API/SubscriptionsAPI.yaml
 
 ## Introduction
 The whole solution is explained and architected in the power point file in the doc folder of this repo, you can access the file from [here](https://github.com/ferry91/code-challenge/raw/main/doc/Adidas%20Coding%20Challenge.pptx) as well.
-
 We encourage you to read that file first, before going forward with this repository.
 
 ## Services
@@ -23,7 +23,7 @@ This repository have 2 micro services:
 * Subscriptions
 * Subscriptions-internal
 
-These are the requirement to run the services locally:
+These are the requirements to run the services locally:
 
 * Java 11
 * Maven 3x
@@ -150,4 +150,43 @@ services:
       - kafka-server
       - db
 ```
+### API Definition
+There is an OpenAPI swagger file that describes the API exposed int eh API folder of this repo. In order to access it quickly, you can read it on [swagger.io directly](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/ferry91/code-challenge/main/API/SubscriptionsAPI.yaml)
 
+### Test the service
+Once you have runned the services successfully you can test the API by running:
+
+```bash
+curl --location --request POST 'http://localhost:8080/subscriptions' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "email": "user3633308@adidas.com",
+  "firstName": "John",
+  "gender": "MALE",
+  "dateOfBirth": "2000-10-23",
+  "consentAccepted": true,
+  "newsletterId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}'
+```
+
+## Frameworks used
+| Framwork                                                     | Description                                                                                        |
+|--------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| org.springframework.boot/spring-boot-starter                 | Spring boot framework starter to build the MS                                                      |
+| org.springframework.kafka/spring-kafka                       | Starter for spring kafka in order to interact with kafka cluster                                   |
+| org.springframework.boot/spring-boot-starter-web             | Starter to build restful applications                                                              |
+| org.springframework.boot/spring-boot-starter-undertow        | Starter to use UnderTow as the embedded servlet container                                          |
+| org.springframework.boot/spring-boot-starter-data-jpa        | Starter to use spring data jpa to interact with DB                                                 |
+| org.springframework.boot/spring-boot-starter-actuator        | Starter to use production-ready features to monitor, etc.                                          |
+| org.springframework.boot/spring-boot-configuration-processor | Enable mapping of configuration properties to beans                                                |
+| org.postgresql/postgresql                                    | PostgreSQL drivers to interact with DB                                                             |
+| org.projectlombok/lombok                                     | Enable Automatic Resource Management, automatic generation of getters, setters, etc.               |
+| org.modelmapper/modelmapper                                  | Library to facilitate mapping java objects to other java objects                                   |
+| javax.persistence/javax.persistence-api                      | API for the management for persistence and object/relational mapping                               |
+| net.logstash.logback/logstash-logback-encoder                | Logger to facilitate production monitoring (I did not finally used it in the local implementation) |
+| io.springfox/springfox-swagger2                              | Set of annotations to define API interfaces                                                        |
+| io.springfox/springfox-swagger-ui                            | Set of annotations to define API interfaces                                                        |
+| javax.xml.bind/jaxb-api                                      | Used to unmarshall and process api interfaces.                                                     |
+| com.fasterxml.jackson.datatype/jackson-datatype-jsr310       | Add-on module to support JSR-310 (Java 8 Date & Time API) data types(used with the above)          |
+| org.openapitools/jackson-databind-nullable                   | Utilities to API interfaces                                                                        |
+| org.hibernate/hibernate-validator                            | Used for bean validations annotations                                                              |
